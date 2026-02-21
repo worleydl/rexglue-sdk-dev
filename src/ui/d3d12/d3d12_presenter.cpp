@@ -24,9 +24,9 @@
 #include <rex/ui/d3d12/d3d12_util.h>
 #include <rex/ui/surface_win.h>
 
-#ifdef _UWP_
+#ifdef _UWP
     // Link against libuwp or implement these yourself in the final exe
-    __declspec(dllimport) void* uwp_GetWindowReference();
+    extern "C" __declspec(dllimport) void* uwp_GetWindowReference();
 #endif
 
 REXCVAR_DEFINE_BOOL(d3d12_allow_variable_refresh_rate_and_tearing, true,
@@ -317,7 +317,7 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
 #else
         if (FAILED(dxgi_factory->CreateSwapChainForCoreWindow(
                 direct_queue, static_cast<IUnknown*>(uwp_GetWindowReference()),
-                &swap_chain_desc, nullptr, &swap_chain_1)) {
+                &swap_chain_desc, nullptr, &swap_chain_1))) {
           REXLOG_ERROR("D3D12Presenter: Failed to create a swap chain for the CoreWindow");
           return SurfacePaintConnectResult::kFailure;
         }

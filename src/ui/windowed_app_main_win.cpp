@@ -22,7 +22,11 @@
 #include <rex/ui/windowed_app_context_win.h>
 #include <rex/logging.h>
 
+#ifndef _UWP
 REXCVAR_DEFINE_BOOL(enable_console, true,
+#else
+REXCVAR_DEFINE_BOOL(enable_console, false,
+#endif
     "Enable console window on Windows",
     "UI/Window");
 
@@ -52,7 +56,15 @@ std::vector<std::string> WideArgsToUtf8(int argc, wchar_t** wargv) {
 
 }  // namespace
 
-int WINAPI wWinMain(HINSTANCE hinstance, HINSTANCE hinstance_prev,
+// todo: setup uwp specific main instead of hacking up this one
+#ifdef _UWP
+#define WINMAIN wWinMain
+#else
+#define WINMAIN external_main
+//int WINAPI WINMAIN(HINSTANCE, HINSTANCE, LPWSTR, int);
+#endif
+
+int WINAPI WINMAIN(HINSTANCE hinstance, HINSTANCE hinstance_prev,
                     LPWSTR command_line, int show_cmd) {
   (void)hinstance_prev;
   (void)command_line;

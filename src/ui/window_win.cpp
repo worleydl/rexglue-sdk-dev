@@ -428,6 +428,7 @@ void Win32Window::ApplyNewTitle() {
 
 void Win32Window::LoadAndApplyIcon(const void* buffer, size_t size,
                                    bool can_apply_state_in_current_phase) {
+#ifndef _UWP
   bool reset = !buffer || !size;
 
   HICON new_icon, new_icon_small;
@@ -476,6 +477,7 @@ void Win32Window::LoadAndApplyIcon(const void* buffer, size_t size,
     assert_true(new_icon_small == new_icon);
     icon_ = new_icon;
   }
+#endif
 }
 
 void Win32Window::ApplyNewMainMenu(MenuItem* old_main_menu) {
