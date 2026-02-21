@@ -28,6 +28,10 @@
 #include <ShellScalingApi.h>
 #include <dwmapi.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void uwp_GetScreenSize(int* x, int* y);
+#endif
+
 namespace rex {
 namespace ui {
 
@@ -307,6 +311,11 @@ bool Win32Window::OpenImpl() {
     // OnFocusUpdate needs to be done before this.
     SetCursorIfFocusedOnClientArea(nullptr);
   }
+#else
+    WindowDestructionReceiver destruction_receiver(this);
+    OnDesiredLogicalSizeUpdate(3840, 2160);
+    OnActualSizeUpdate(GetDesiredLogicalWidth(), GetDesiredLogicalHeight(), destruction_receiver);
+    OnFocusUpdate(true, destruction_receiver);
 #endif // _UWP
 
   return true;
