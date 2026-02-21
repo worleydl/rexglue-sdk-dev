@@ -1106,6 +1106,7 @@ Presenter::PaintResult D3D12Presenter::PaintAndPresentImpl(
 bool D3D12Presenter::InitializeSurfaceIndependent() {
   // Check if DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING is supported.
   {
+#ifndef _UWP
     Microsoft::WRL::ComPtr<IDXGIFactory5> dxgi_factory_5;
     if (SUCCEEDED(provider_.GetDXGIFactory()->QueryInterface(
             IID_PPV_ARGS(&dxgi_factory_5)))) {
@@ -1116,6 +1117,9 @@ bool D3D12Presenter::InitializeSurfaceIndependent() {
               sizeof(tearing_feature_data))) &&
           tearing_feature_data;
     }
+#else
+    dxgi_supports_tearing_ = false;
+#endif
   }
 
   ID3D12Device* device = provider_.GetDevice();

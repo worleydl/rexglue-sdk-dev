@@ -305,6 +305,7 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
       float(window_->GetMediumDpi()) / float(window_->GetDpi());
 #else
   float physical_to_logical = 1.0f;
+  io.FontGlobalScale = window_->GetActualPhysicalHeight() / 1080.0f;
 #endif
   io.DisplaySize.x = window_->GetActualPhysicalWidth() * physical_to_logical;
   io.DisplaySize.y = window_->GetActualPhysicalHeight() * physical_to_logical;

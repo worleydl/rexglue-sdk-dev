@@ -313,7 +313,6 @@ bool Win32Window::OpenImpl() {
   }
 #else
     WindowDestructionReceiver destruction_receiver(this);
-    OnDesiredLogicalSizeUpdate(3840, 2160);
     OnActualSizeUpdate(GetDesiredLogicalWidth(), GetDesiredLogicalHeight(), destruction_receiver);
     OnFocusUpdate(true, destruction_receiver);
 #endif // _UWP
