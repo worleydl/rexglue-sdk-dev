@@ -567,7 +567,7 @@ void Win32Window::RequestPaintImpl() {
 #ifndef _UWP
     InvalidateRect(hwnd_, nullptr, FALSE);
 #else
-    OnPaint(true);
+    OnPaint();
 #endif
 }
 
