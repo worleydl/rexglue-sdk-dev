@@ -21,6 +21,10 @@
 #include <rex/platform/win.h>
 #include <rex/string.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void uwp_GetBundlePath(char* buffer);
+#endif
+
 namespace rex {
 
 std::string path_to_utf8(const std::filesystem::path& path) {
@@ -42,8 +46,14 @@ std::filesystem::path to_path(const std::u16string_view source) {
 namespace filesystem {
 
 std::filesystem::path GetExecutablePath() {
+#ifndef _UWP
   wchar_t* path;
   auto error = _get_wpgmptr(&path);
+#else
+    char path[256];
+    ::uwp_GetBundlePath(path);
+    auto error = 0;
+#endif
   return !error ? std::filesystem::path(path) : std::filesystem::path();
 }
 

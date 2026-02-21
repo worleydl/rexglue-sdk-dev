@@ -57,7 +57,7 @@ std::vector<std::string> WideArgsToUtf8(int argc, wchar_t** wargv) {
 }  // namespace
 
 // todo: setup uwp specific main instead of hacking up this one
-#ifdef _UWP
+#ifndef _UWP
 #define WINMAIN wWinMain
 #else
 #define WINMAIN external_main

@@ -18,9 +18,15 @@ namespace ui {
 bool Win32HwndSurface::GetSizeImpl(uint32_t& width_out,
                                    uint32_t& height_out) const {
   RECT client_rect;
+#ifndef _UWP
   if (!GetClientRect(hwnd(), &client_rect)) {
     return false;
   }
+#else
+  client_rect.right = 3840;
+  client_rect.bottom = 2160;
+#endif
+
   // GetClientRect returns a rectangle with 0 origin.
   width_out = uint32_t(client_rect.right);
   height_out = uint32_t(client_rect.bottom);

@@ -16,6 +16,10 @@
 #include <rex/assert.h>
 #include <rex/thread.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void uwp_DispatchEvent(std::function<void()> func);
+#endif
+
 namespace rex {
 namespace ui {
 
@@ -56,7 +60,11 @@ bool WindowedAppContext::CallInUIThreadDeferred(
       // Will not be called as the loop will not be executed anymore.
       return false;
     }
+#ifndef _UWP
     pending_functions_.emplace_back(std::move(function));
+#else
+    uwp_DispatchEvent(function);
+#endif
   }
   // Notify unconditionally, even if currently running pending functions. It's
   // possible for pending functions themselves to run inner platform message

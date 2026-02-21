@@ -15,6 +15,11 @@
 
 #include <rex/platform.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void* uwp_GetWindowReference();
+extern "C" __declspec(dllimport) void uwp_ProcessEventsPending();
+#endif
+
 namespace rex {
 namespace ui {
 
@@ -67,6 +72,7 @@ bool Win32WindowedAppContext::Initialize() {
              GetProcAddress(user32_module_, "GetDpiForWindow")) != nullptr;
   }
 
+#ifndef _UWP
   // Create the message-only window for executing pending functions - using a
   // window instead of executing them between iterations so non-main message
   // loops, such as Windows modals, can execute pending functions too.
@@ -92,15 +98,18 @@ bool Win32WindowedAppContext::Initialize() {
   if (!pending_functions_hwnd_) {
     return false;
   }
+#endif
 
   return true;
 }
 
 void Win32WindowedAppContext::NotifyUILoopOfPendingFunctions() {
+#ifndef _UWP
   while (!PostMessageW(pending_functions_hwnd_,
                        kPendingFunctionsWindowClassMessageExecute, 0, 0)) {
     Sleep(1);
   }
+#endif
 }
 
 void Win32WindowedAppContext::PlatformQuitFromUIThread() {
@@ -116,6 +125,7 @@ int Win32WindowedAppContext::RunMainMessageLoop() {
   // The HasQuitFromUIThread check is not absolutely required, but for
   // additional safety in case WM_QUIT is not received for any reason.
   while (!HasQuitFromUIThread()) {
+#ifndef _UWP
     BOOL message_result = GetMessageW(&message, nullptr, 0, 0);
     if (message_result == 0 || message_result == -1) {
       // WM_QUIT (0 - this is the primary message loop, no need to resend, also
@@ -130,6 +140,9 @@ int Win32WindowedAppContext::RunMainMessageLoop() {
     }
     TranslateMessage(&message);
     DispatchMessageW(&message);
+#else
+    uwp_ProcessEventsPending();
+#endif
   }
   return result;
 }

@@ -22,7 +22,11 @@
 #include <rex/graphics/d3d12/command_processor.h>
 #include <rex/ui/d3d12/d3d12_util.h>
 
+#ifndef _UWP
 REXCVAR_DEFINE_BOOL(d3d12_tiled_shared_memory, true,
+#else
+REXCVAR_DEFINE_BOOL(d3d12_tiled_shared_memory, false,
+#endif
     "Use tiled shared memory on D3D12",
     "GPU/D3D12")
     .lifecycle(rex::cvar::Lifecycle::kRequiresRestart);
@@ -48,6 +52,7 @@ bool D3D12SharedMemory::Initialize() {
   ui::d3d12::util::FillBufferResourceDesc(
       buffer_desc, kBufferSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
   buffer_state_ = D3D12_RESOURCE_STATE_COPY_DEST;
+#ifndef _UWP
   if (REXCVAR_GET(d3d12_tiled_shared_memory) &&
       provider.GetTiledResourcesTier() !=
           D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED &&
@@ -63,11 +68,13 @@ bool D3D12SharedMemory::Initialize() {
     InitializeSparseHostGpuMemory(
         std::max(kHostGpuMemoryOptimalSparseAllocationLog2, uint32_t(16)));
   } else {
+#endif
     REXGPU_INFO(
         "Direct3D 12 tiled resources are not used for shared memory "
         "emulation - video memory usage may increase significantly "
         "because a full {} MB buffer will be created",
         kBufferSize >> 20);
+#ifndef _UWP
     if (provider.GetGraphicsAnalysis()) {
       // As of October 8th, 2018, PIX doesn't support tiled buffers.
       // FIXME(Triang3l): Re-enable tiled resources with PIX once fixed.
@@ -75,6 +82,7 @@ bool D3D12SharedMemory::Initialize() {
           "This is caused by PIX being attached, which doesn't support tiled "
           "resources yet.");
     }
+#endif
     if (FAILED(device->CreateCommittedResource(
             &ui::d3d12::util::kHeapPropertiesDefault,
             provider.GetHeapFlagCreateNotZeroed(), &buffer_desc, buffer_state_,
@@ -84,7 +92,9 @@ bool D3D12SharedMemory::Initialize() {
       Shutdown();
       return false;
     }
+#ifndef _UWP
   }
+#endif
   buffer_gpu_address_ = buffer_->GetGPUVirtualAddress();
   buffer_uav_writes_commit_needed_ = false;
 

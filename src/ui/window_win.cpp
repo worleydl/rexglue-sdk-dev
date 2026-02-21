@@ -70,6 +70,7 @@ Win32Window::~Win32Window() {
 uint32_t Win32Window::GetMediumDpi() const { return USER_DEFAULT_SCREEN_DPI; }
 
 bool Win32Window::OpenImpl() {
+#ifndef _UWP
   const Win32WindowedAppContext& win32_app_context =
       static_cast<const Win32WindowedAppContext&>(app_context());
   HINSTANCE hinstance = win32_app_context.hinstance();
@@ -306,6 +307,13 @@ bool Win32Window::OpenImpl() {
     // OnFocusUpdate needs to be done before this.
     SetCursorIfFocusedOnClientArea(nullptr);
   }
+#else
+    WindowDestructionReceiver destruction_receiver(this);
+    OnDesiredLogicalSizeUpdate(3840, 2160);
+    OnActualSizeUpdate(uint32_t(3840),
+                       uint32_t(2160),
+                       destruction_receiver);
+#endif // _UWP
 
   return true;
 }
@@ -553,7 +561,13 @@ std::unique_ptr<Surface> Win32Window::CreateSurfaceImpl(
   return nullptr;
 }
 
-void Win32Window::RequestPaintImpl() { InvalidateRect(hwnd_, nullptr, FALSE); }
+void Win32Window::RequestPaintImpl() {
+#ifndef _UWP
+    InvalidateRect(hwnd_, nullptr, FALSE);
+#else
+    OnPaint(true);
+#endif
+}
 
 BOOL Win32Window::AdjustWindowRectangle(RECT& rect, DWORD style, BOOL menu,
                                         DWORD ex_style, UINT dpi) const {

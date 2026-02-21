@@ -1162,10 +1162,14 @@ bool Presenter::RequestPaintOrConnectionRecoveryViaWindow(
   // theoretically. For safety, check whether the window exists unconditionally.
   assert_not_null(window_);
   assert_not_null(surface_);
+
+#ifndef _UWP
   if (ui_thread_paint_requested_.exchange(true, std::memory_order_relaxed)) {
     // Invalidation pending already, no need to do it twice.
     return false;
   }
+#endif
+
   if (force_ui_thread_paint_tick) {
     ForceUIThreadPaintTick();
   }
@@ -1238,7 +1242,7 @@ bool Presenter::InSurfaceOnMonitorFromUIThread() const {
   if (!surface_) {
     return false;
   }
-#if REX_PLATFORM_WIN32
+#if REX_PLATFORM_WIN32 && !_UWP
   return surface_win32_monitor_ != nullptr;
 #else
   return true;
