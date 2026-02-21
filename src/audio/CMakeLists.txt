@@ -21,7 +21,16 @@ target_include_directories(rexaudio PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+if (NOT UWP_BUILD)
+    target_link_libraries(rexaudio
+        PUBLIC rexcore SDL2::SDL2
+    )
+else()
+    target_link_libraries(rexaudio
+        PUBLIC rexcore SDL2
+    )
+endif()
+
 target_link_libraries(rexaudio
-    PUBLIC rexcore SDL2::SDL2
     PRIVATE libavcodec libavutil
 )

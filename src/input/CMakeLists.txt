@@ -13,4 +13,10 @@ target_include_directories(rexinput PUBLIC
 )
 
 target_sources(rexinput PRIVATE sdl/sdl_input_driver.cpp)
-target_link_libraries(rexinput PUBLIC rexcore SDL2::SDL2)
+
+target_link_libraries(rexinput PUBLIC rexcore)
+if (NOT UWP_BUILD)
+    target_link_libraries(rexinput PUBLIC SDL2::SDL2)
+else()
+    target_link_libraries(rexinput PUBLIC SDL2)
+endif()

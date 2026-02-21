@@ -1,12 +1,20 @@
 # ReXGlue SDK - Xbox 360 Recompilation Toolkit
 # Modern C++23 cross-platform SDK for recompiling Xbox 360 executables
 cmake_minimum_required(VERSION 3.25)
+include(FetchContent)
 
 project(ReXGlue
     VERSION 0.1.1
     LANGUAGES C CXX
     DESCRIPTION "Xbox 360 Recompilation SDK"
 )
+
+# Fetch shared UWP deps
+FetchContent_Declare(UwpLibs
+    GIT_REPOSITORY https://github.com/worleydl/uwp-dep.git
+    GIT_TAG d65bd2221e58aba63cbb7078538176b259c01106
+)
+FetchContent_MakeAvailable(UwpLibs)
 
 #==========================================================
 # Build Options
@@ -79,6 +87,7 @@ if(WIN32)
     add_compile_definitions(REX_PLATFORM_WINDOWS=1)
 
     # [UWP] todo: update preset or something
+    option(UWP_BUILD "Update configuration for UWP compatibility" ON)
     add_compile_definitions(_UWP)
 elseif(UNIX AND NOT APPLE)
     set(REX_PLATFORM "linux-amd64")

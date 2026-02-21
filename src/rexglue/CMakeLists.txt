@@ -16,8 +16,7 @@ target_include_directories(rexglue
 target_link_libraries(rexglue
     PRIVATE
         rexcodegen
-        # tmp hack, move fetchcontent to main project?
-        ${CMAKE_SOURCE_DIR}/tmpdep/libuwp.lib
+	LIBUWP
 )
 
 add_executable(rex::rexglue ALIAS rexglue)

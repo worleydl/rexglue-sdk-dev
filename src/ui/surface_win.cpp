@@ -29,8 +29,8 @@ bool Win32HwndSurface::GetSizeImpl(uint32_t& width_out,
 #else
   int uwp_x, uwp_y;
   uwp_GetScreenSize(&uwp_x, &uwp_y);
-  client_rect.right = uwp_x;
-  client_rect.bottom = uwp_y;
+  client_rect.right = 1920; // uwp_x;
+  client_rect.bottom = 1080; // uwp_y;
 #endif
 
   // GetClientRect returns a rectangle with 0 origin.
