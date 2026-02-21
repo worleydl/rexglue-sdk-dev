@@ -307,12 +307,6 @@ bool Win32Window::OpenImpl() {
     // OnFocusUpdate needs to be done before this.
     SetCursorIfFocusedOnClientArea(nullptr);
   }
-#else
-    WindowDestructionReceiver destruction_receiver(this);
-    OnDesiredLogicalSizeUpdate(3840, 2160);
-    OnActualSizeUpdate(uint32_t(3840),
-                       uint32_t(2160),
-                       destruction_receiver);
 #endif // _UWP
 
   return true;

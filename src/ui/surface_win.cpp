@@ -11,6 +11,10 @@
 
 #include <rex/ui/surface_win.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void uwp_GetScreenSize(int* x, int* y);
+#endif
+
 namespace rex {
 namespace ui {
 
@@ -23,8 +27,10 @@ bool Win32HwndSurface::GetSizeImpl(uint32_t& width_out,
     return false;
   }
 #else
-  client_rect.right = 3840;
-  client_rect.bottom = 2160;
+  int uwp_x, uwp_y;
+  uwp_GetScreenSize(&uwp_x, &uwp_y);
+  client_rect.right = uwp_x;
+  client_rect.bottom = uwp_y;
 #endif
 
   // GetClientRect returns a rectangle with 0 origin.

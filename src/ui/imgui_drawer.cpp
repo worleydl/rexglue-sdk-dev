@@ -25,6 +25,10 @@
 #include <rex/ui/ui_event.h>
 #include <rex/ui/window.h>
 
+#ifdef _UWP
+extern "C" __declspec(dllimport) void uwp_GetScreenSize(int* x, int* y);
+#endif
+
 namespace rex {
 namespace ui {
 
@@ -302,8 +306,15 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
 
   float physical_to_logical =
       float(window_->GetMediumDpi()) / float(window_->GetDpi());
+#ifndef _UWP
   io.DisplaySize.x = window_->GetActualPhysicalWidth() * physical_to_logical;
   io.DisplaySize.y = window_->GetActualPhysicalHeight() * physical_to_logical;
+#else
+  int uwp_x, uwp_y;
+  uwp_GetScreenSize(&uwp_x, &uwp_y);
+  io.DisplaySize.x = uwp_x;
+  io.DisplaySize.y = uwp_y;
+#endif
 
   ImGui::NewFrame();
 
