@@ -77,6 +77,9 @@ add_compile_options(
 if(WIN32)
     set(REX_PLATFORM "win-amd64")
     add_compile_definitions(REX_PLATFORM_WINDOWS=1)
+
+    # [UWP] todo: update preset or something
+    add_compile_definitions(_UWP)
 elseif(UNIX AND NOT APPLE)
     set(REX_PLATFORM "linux-amd64")
     add_compile_definitions(REX_PLATFORM_LINUX=1)

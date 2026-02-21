@@ -24,6 +24,11 @@
 #include <rex/ui/d3d12/d3d12_util.h>
 #include <rex/ui/surface_win.h>
 
+#ifdef _UWP_
+    // Link against libuwp or implement these yourself in the final exe
+    __declspec(dllimport) void* uwp_GetWindowReference();
+#endif
+
 REXCVAR_DEFINE_BOOL(d3d12_allow_variable_refresh_rate_and_tearing, true,
     "Allow variable refresh rate and tearing",
     "UI/D3D12");
@@ -294,6 +299,7 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
     switch (surface_type) {
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_GAMES)
       case Surface::kTypeIndex_Win32Hwnd: {
+#ifndef _UWP
         HWND surface_hwnd =
             static_cast<const Win32HwndSurface&>(new_surface).hwnd();
         if (FAILED(dxgi_factory->CreateSwapChainForHwnd(
@@ -308,6 +314,14 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
         // better, and nothing is presented for some reason.
         dxgi_factory->MakeWindowAssociation(surface_hwnd,
                                             DXGI_MWA_NO_ALT_ENTER);
+#else
+        if (FAILED(dxgi_factory->CreateSwapChainForCoreWindow(
+                direct_queue, static_cast<IUnknown*>(uwp_GetWindowReference()),
+                &swap_chain_desc, nullptr, &swap_chain_1)) {
+          REXLOG_ERROR("D3D12Presenter: Failed to create a swap chain for the CoreWindow");
+          return SurfacePaintConnectResult::kFailure;
+        }
+#endif
       } break;
 #endif
       default:
