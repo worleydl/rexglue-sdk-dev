@@ -37,6 +37,7 @@
 #include <rex/audio/audio_system.h>
 #include <rex/audio/nop/nop_audio_system.h>
 #include <rex/audio/sdl/sdl_audio_system.h>
+#include <rex/audio/xaudio2/xaudio2_audio_system.h>
 
 namespace rex {
 
@@ -106,8 +107,13 @@ X_STATUS Runtime::Setup(bool tool_mode) {
   // Initialize the APU (Audio Processing Unit)
   const char* audio_backend_name = nullptr;
   if (!tool_mode_) {
+#ifndef _UWP
     audio_system_ = audio::sdl::SDLAudioSystem::Create(processor_.get());
     audio_backend_name = "SDL";
+#else
+    audio_system_ = audio::xaudio2::XAudio2AudioSystem::Create(processor_.get());
+    audio_backend_name = "XAudio2";
+#endif
   } else {
     audio_system_ = audio::nop::NopAudioSystem::Create(processor_.get());
     audio_backend_name = "NOP (tool mode)";

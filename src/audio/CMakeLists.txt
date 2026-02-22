@@ -13,6 +13,10 @@ add_library(rexaudio STATIC
     # SDL backend
     sdl/sdl_audio_system.cpp
     sdl/sdl_audio_driver.cpp
+    # XAudio2 (todo: UWP only?)
+    xaudio2/xaudio2_apu_flags.cpp
+    xaudio2/xaudio2_audio_driver.cpp
+    xaudio2/xaudio2_audio_system.cpp
 )
 add_library(rex::audio ALIAS rexaudio)
 
